@@ -1,6 +1,6 @@
 "use strict";
 
-var version = 4;
+var version = 5;
 var isOnline = true;
 var isLoggedIn = false;
 var cacheName = `ramblings-${version}`;
@@ -26,6 +26,7 @@ var urlsToCache = {
 self.addEventListener("install",onInstall);
 self.addEventListener("activate",onActivate);
 self.addEventListener("message",onMessage);
+self.addEventListener("fetch",onFetch);
 
 main().catch(console.error);
 
@@ -116,4 +117,120 @@ function onMessage({ data }) {
 		({ isOnline, isLoggedIn } = data.statusUpdate);
 		console.log(`Service Worker (v${version}) status update... isOnline:${isOnline}, isLoggedIn:${isLoggedIn}`);
 	}
+}
+
+function onFetch(evt) {
+	evt.respondWith(router(evt.request));
+}
+
+async function router(req) {
+	var url = new URL(req.url);
+	var reqURL = url.pathname;
+	var cache = await caches.open(cacheName);
+
+	// request for site's own URL?
+	if (url.origin == location.origin) {
+		// are we making an API request?
+		if (/^\/api\/.+$/.test(reqURL)) {
+			let res;
+
+			if (isOnline) {
+				try {
+					let fetchOptions = {
+						method: req.method,
+						headers: req.headers,
+						credentials: "same-origin",
+						cache: "no-store",
+					};
+					res = await fetch(req.url,fetchOptions);
+					if (res && res.ok) {
+						if (req.method == "GET") {
+							await cache.put(reqURL,res.clone());
+						}
+						return res;
+					}
+				}
+				catch (err) {}
+			}
+
+			res = await cache.match(reqURL);
+			if (res) {
+				return res;
+			}
+
+			return notFoundResponse();
+		}
+		// are we requesting a page?
+		else if (req.headers.get("Accept").includes("text/html")) {
+			// login-aware requests?
+			if (/^\/(?:login|logout|add-post)$/.test(reqURL)) {
+				// TODO
+			}
+			// otherwise, just use "network-and-cache"
+			else {
+				let res;
+
+				if (isOnline) {
+					try {
+						let fetchOptions = {
+							method: req.method,
+							headers: req.headers,
+							cache: "no-store",
+						};
+						res = await fetch(req.url,fetchOptions);
+						if (res && res.ok) {
+							if (!res.headers.get("X-Not-Found")) {
+								await cache.put(reqURL,res.clone());
+							}
+							return res;
+						}
+					}
+					catch (err) {}
+				}
+
+				// fetch failed, so try the cache
+				res = await cache.match(reqURL);
+				if (res) {
+					return res;
+				}
+
+				// otherwise, return an offline-friendly page
+				return cache.match("/offline");
+			}
+		}
+		// all other files use "cache-first"
+		else {
+			let res = await cache.match(reqURL);
+			if (res) {
+				return res;
+			}
+			else {
+				if (isOnline) {
+					try {
+						let fetchOptions = {
+							method: req.method,
+							headers: req.headers,
+							cache: "no-store",
+						};
+						res = await fetch(req.url,fetchOptions);
+						if (res && res.ok) {
+							await cache.put(reqURL,res.clone());
+							return res;
+						}
+					}
+					catch (err) {}
+				}
+
+				// otherwise, force a network-level 404 response
+				return notFoundResponse();
+			}
+		}
+	}
+}
+
+function notFoundResponse() {
+	return new Response("",{
+		status: 404,
+		statusText: "Not Found"
+	});
 }
