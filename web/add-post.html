@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>My Ramblings :: Add Post</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+	<header>
+		<h1>My Ramblings</h1>
+		<nav>
+			<ul>
+				<li><a href="/">Home</a></li>
+				<li><a href="/about">About</a></li>
+				<li><a href="/contact">Contact</a></li>
+				<li><a href="/logout">Logout</a></li>
+			</ul>
+		</nav>
+		<div id="connectivity-status" class="hidden"></div>
+	</header>
+
+	<main>
+		<h1>Add Post</h1>
+		<p>
+			Title: <input id="new-title" size="40">
+		</p>
+		<p>
+			<textarea id="new-post" cols="70" rows="15"></textarea>
+		</p>
+		<p>
+			<button type="button" id="btn-add-post">Add Post</button>
+		</p>
+	</main>
+
+	<script src="/js/blog.js"></script>
+	<script src="/js/add-post.js"></script>
+</body>
+</html>

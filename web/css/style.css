@@ -1,0 +1,108 @@
+html {
+	box-sizing: border-box;
+	font-family: sans-serif;
+	font-size: 1.3em;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+html input,
+html button,
+html textarea {
+	font-size: 1em;
+}
+
+html,
+body {
+	background-color: #e5efff;
+}
+
+#connectivity-status {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 55px;
+	height: 49px;
+	background: url(/images/offline.png) 0px 0px/55px 49px no-repeat;
+}
+
+#connectivity-status.hidden {
+	display: none;
+}
+
+header {
+	position: relative;
+	max-width: 800px;
+	margin: 0px auto;
+	color: #222;
+}
+
+header h1 {
+	position: relative;
+	padding-left: 90px;
+}
+
+header h1::before {
+	content: "";
+	display: block;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 63px;
+	height: 75px;
+	background: url(/images/logo.gif) 0px 0px/63px 75px no-repeat;
+}
+
+nav {
+	background-color: #5078ba;
+	color: #fff;
+}
+
+nav ul {
+	padding: 0px;
+	padding-left: 20px;
+	margin: 0px;
+	list-style: none;
+}
+
+nav ul li {
+	display: inline-block;
+	padding: 10px;
+}
+
+nav ul li a {
+	color: #fff;
+	text-decoration: none;
+}
+
+main {
+	margin: 0px auto;
+	max-width: 800px;
+	background-color: #fff;
+	color: #000;
+	padding: 30px;
+}
+
+main a {
+	color: #000;
+}
+
+main > h1:first-child {
+	margin-top: 0px;
+}
+
+#my-posts {
+	list-style: none;
+}
+
+#my-posts > li {
+	margin-bottom: 12px;
+}
+
+#my-posts > li:last-child {
+	margin-bottom: 0px;
+}
