@@ -27,10 +27,12 @@
 		window.addEventListener("online",function online(){
 			offlineIcon.classList.add("hidden");
 			isOnline = true;
+			sendStatusUpdate();
 		},false);
 		window.addEventListener("offline",function offline(){
 			offlineIcon.classList.remove("hidden");
 			isOnline = false;
+			sendStatusUpdate();
 		},false);
 	}
 
@@ -40,11 +42,39 @@
 		});
 
 		svcworker = swRegistration.installing || swRegistration.waiting || swRegistration.active;
+		sendStatusUpdate(svcworker);
 
 		// listen for new service worker to take over
 		navigator.serviceWorker.addEventListener("controllerchange",async function onController(){
 			svcworker = navigator.serviceWorker.controller;
+			sendStatusUpdate(svcworker);
 		});
+
+		navigator.serviceWorker.addEventListener("message",onSWMessage,false);
+	}
+
+	function onSWMessage(evt) {
+		var { data } = evt;
+		if (data.statusUpdateRequest) {
+			console.log("Status update requested from service worker, responding...");
+			sendStatusUpdate(evt.ports && evt.ports[0]);
+		}
+	}
+
+	function sendStatusUpdate(target) {
+		sendSWMessage({ statusUpdate: { isOnline, isLoggedIn } },target);
+	}
+
+	function sendSWMessage(msg,target) {
+		if (target) {
+			target.postMessage(msg);
+		}
+		else if (svcworker) {
+			svcworker.postMessage(msg);
+		}
+		else if (navigator.serviceWorker.controller) {
+			navigator.serviceWorker.controller.postMessage(msg);
+		}
 	}
 
 })();
