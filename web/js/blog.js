@@ -1,4 +1,4 @@
-(function Blog(){
+(function Blog(global){
 	"use strict";
 
 	var offlineIcon;
@@ -11,6 +11,8 @@
 	if (usingSW) {
 		initServiceWorker().catch(console.error);
 	}
+
+	global.isBlogOnline = isBlogOnline;
 
 	document.addEventListener("DOMContentLoaded",ready,false);
 
@@ -34,6 +36,10 @@
 			isOnline = false;
 			sendStatusUpdate();
 		},false);
+	}
+
+	function isBlogOnline() {
+		return isOnline;
 	}
 
 	async function initServiceWorker() {
@@ -82,4 +88,4 @@
 		}
 	}
 
-})();
+})(window);
