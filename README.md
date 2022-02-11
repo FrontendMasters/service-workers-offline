@@ -1,4 +1,4 @@
-# Service Workers & Offline Course by Kyle Simpson
+# [Service Workers & Offline Course](https://frontendmasters.com/courses/service-workers/) by Kyle Simpson
 
 Code for the Service Workers / PWA section of the Service Workers and Offline course by Kyle Simpson
 
